@@ -1,0 +1,20 @@
+# Java / Maven
+backend/target/
+*.class
+
+# Node.js / React
+frontend/node_modules/
+frontend/dist/
+
+# Configurações locais
+.env
+.env.*
+!.env.example
+
+# IDEs
+.vscode/
+.idea/
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
