@@ -11,13 +11,17 @@ public final class PlayerOverallCalculator {
 
     public static int calculate(Player player) {
         if (player == null) {
-            throw new IllegalArgumentException("O jogador não pode ser nulo.");
+            throw new IllegalArgumentException(
+                    "O jogador nao pode ser nulo."
+            );
         }
 
         PlayerPosition position = player.getPosition();
 
         if (position == null) {
-            throw new IllegalArgumentException("A posição do jogador é obrigatória.");
+            throw new IllegalArgumentException(
+                    "A posicao do jogador e obrigatoria."
+            );
         }
 
         int pace = requireAttribute(player.getPace(), "pace");
@@ -29,16 +33,21 @@ public final class PlayerOverallCalculator {
 
         int weightedScore = switch (position) {
             case GOL -> pace * 10
+                    + shooting * 0
                     + passing * 20
+                    + dribbling * 0
                     + defending * 40
                     + physical * 30;
 
             case ZAG -> pace * 10
+                    + shooting * 0
                     + passing * 15
+                    + dribbling * 0
                     + defending * 45
                     + physical * 30;
 
             case LAT -> pace * 25
+                    + shooting * 0
                     + passing * 20
                     + dribbling * 15
                     + defending * 25
@@ -55,17 +64,21 @@ public final class PlayerOverallCalculator {
                     + shooting * 40
                     + passing * 10
                     + dribbling * 20
+                    + defending * 0
                     + physical * 10;
         };
 
-        // Arredondamento para o inteiro mais próximo, com empate para cima.
+        // Arredondamento para o inteiro mais proximo, com meio para cima.
         return (weightedScore + 50) / 100;
     }
 
-    private static int requireAttribute(Integer value, String attributeName) {
+    private static int requireAttribute(
+            Integer value,
+            String attributeName
+    ) {
         if (value == null) {
             throw new IllegalArgumentException(
-                    "O atributo " + attributeName + " é obrigatório."
+                    "O atributo " + attributeName + " e obrigatorio."
             );
         }
 

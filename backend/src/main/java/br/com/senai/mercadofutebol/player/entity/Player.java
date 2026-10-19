@@ -1,3 +1,4 @@
+
 package br.com.senai.mercadofutebol.player.entity;
 
 import jakarta.persistence.Column;
@@ -94,7 +95,7 @@ public class Player {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(name = "condition", nullable = false, length = 20)
+    @Column(nullable = false, length = 20)
     private PhysicalCondition condition = PhysicalCondition.APTO;
 
     @Column(name = "club_id")
@@ -103,12 +104,11 @@ public class Player {
     @Column(name = "is_deleted", nullable = false)
     private boolean deleted = false;
 
-    protected Player() {
-        // Construtor exigido pelo JPA.
+    public Player() {
     }
 
     @PrePersist
-    protected void initializeDefaults() {
+    protected void onCreate() {
         if (condition == null) {
             condition = PhysicalCondition.APTO;
         }
@@ -116,6 +116,10 @@ public class Player {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
