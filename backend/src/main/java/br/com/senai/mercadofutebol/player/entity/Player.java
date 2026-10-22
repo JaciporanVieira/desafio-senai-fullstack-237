@@ -1,15 +1,7 @@
 
 package br.com.senai.mercadofutebol.player.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -112,133 +104,56 @@ public class Player {
         if (condition == null) {
             condition = PhysicalCondition.APTO;
         }
+        if (deleted == false) {
+            deleted = false;
+        }
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public String getName() {
-        return name;
-    }
+    public PlayerPosition getPosition() { return position; }
+    public void setPosition(PlayerPosition position) { this.position = position; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public Integer getAgility() { return agility; }
+    public void setAgility(Integer agility) { this.agility = agility; }
 
-    public PlayerPosition getPosition() {
-        return position;
-    }
+    public Integer getAge() { return age; }
+    public void setAge(Integer age) { this.age = age; }
 
-    public void setPosition(PlayerPosition position) {
-        this.position = position;
-    }
+    public Integer getPace() { return pace; }
+    public void setPace(Integer pace) { this.pace = pace; }
 
-    public Integer getAgility() {
-        return agility;
-    }
+    public Integer getShooting() { return shooting; }
+    public void setShooting(Integer shooting) { this.shooting = shooting; }
 
-    public void setAgility(Integer agility) {
-        this.agility = agility;
-    }
+    public Integer getPassing() { return passing; }
+    public void setPassing(Integer passing) { this.passing = passing; }
 
-    public Integer getAge() {
-        return age;
-    }
+    public Integer getDribbling() { return dribbling; }
+    public void setDribbling(Integer dribbling) { this.dribbling = dribbling; }
 
-    public void setAge(Integer age) {
-        this.age = age;
-    }
+    public Integer getDefending() { return defending; }
+    public void setDefending(Integer defending) { this.defending = defending; }
 
-    public Integer getPace() {
-        return pace;
-    }
+    public Integer getPhysical() { return physical; }
+    public void setPhysical(Integer physical) { this.physical = physical; }
 
-    public void setPace(Integer pace) {
-        this.pace = pace;
-    }
+    public Integer getPotential() { return potential; }
+    public void setPotential(Integer potential) { this.potential = potential; }
 
-    public Integer getShooting() {
-        return shooting;
-    }
+    public BigDecimal getBaseValue() { return baseValue; }
+    public void setBaseValue(BigDecimal baseValue) { this.baseValue = baseValue; }
 
-    public void setShooting(Integer shooting) {
-        this.shooting = shooting;
-    }
+    public PhysicalCondition getCondition() { return condition; }
+    public void setCondition(PhysicalCondition condition) { this.condition = condition; }
 
-    public Integer getPassing() {
-        return passing;
-    }
+    public Long getClubId() { return clubId; }
+    public void setClubId(Long clubId) { this.clubId = clubId; }
 
-    public void setPassing(Integer passing) {
-        this.passing = passing;
-    }
-
-    public Integer getDribbling() {
-        return dribbling;
-    }
-
-    public void setDribbling(Integer dribbling) {
-        this.dribbling = dribbling;
-    }
-
-    public Integer getDefending() {
-        return defending;
-    }
-
-    public void setDefending(Integer defending) {
-        this.defending = defending;
-    }
-
-    public Integer getPhysical() {
-        return physical;
-    }
-
-    public void setPhysical(Integer physical) {
-        this.physical = physical;
-    }
-
-    public Integer getPotential() {
-        return potential;
-    }
-
-    public void setPotential(Integer potential) {
-        this.potential = potential;
-    }
-
-    public BigDecimal getBaseValue() {
-        return baseValue;
-    }
-
-    public void setBaseValue(BigDecimal baseValue) {
-        this.baseValue = baseValue;
-    }
-
-    public PhysicalCondition getCondition() {
-        return condition;
-    }
-
-    public void setCondition(PhysicalCondition condition) {
-        this.condition = condition;
-    }
-
-    public Long getClubId() {
-        return clubId;
-    }
-
-    public void setClubId(Long clubId) {
-        this.clubId = clubId;
-    }
-
-    public boolean isDeleted() {
-        return deleted;
-    }
-
-    public void setDeleted(boolean deleted) {
-        this.deleted = deleted;
-    }
+    public boolean isDeleted() { return deleted; }
+    public void setDeleted(boolean deleted) { this.deleted = deleted; }
 }
