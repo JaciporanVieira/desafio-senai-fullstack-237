@@ -18,14 +18,13 @@ public final class PlayerSpecifications {
             String position,
             String condition,
             Boolean free,
-            Long clubId,
+            Integer clubId,
             Integer minAge,
             Integer maxAge) {
 
         return (root, query, cb) -> {
-            var predicates = cb.isFalse(root.get("deleted"));
+            var predicates = cb.isNull(root.get("deletedAt"));
 
-            // Pesquisa parcial pelo nome, sem diferenciar maiúsculas/minúsculas.
             if (search != null && !search.isBlank()) {
                 String term = "%"
                         + search.trim().toLowerCase(Locale.ROOT)
@@ -36,7 +35,6 @@ public final class PlayerSpecifications {
                         cb.like(cb.lower(root.get("name")), term));
             }
 
-            // Filtro por posição.
             if (position != null && !position.isBlank()) {
                 PlayerPosition parsedPosition;
 
@@ -53,7 +51,6 @@ public final class PlayerSpecifications {
                         cb.equal(root.get("position"), parsedPosition));
             }
 
-            // Filtro por condição física.
             if (condition != null && !condition.isBlank()) {
                 PhysicalCondition parsedCondition;
 
@@ -70,7 +67,6 @@ public final class PlayerSpecifications {
                         cb.equal(root.get("condition"), parsedCondition));
             }
 
-            // Jogadores livres ou vinculados a clubes.
             if (Boolean.TRUE.equals(free)) {
                 predicates = cb.and(
                         predicates,
@@ -81,14 +77,12 @@ public final class PlayerSpecifications {
                         cb.isNotNull(root.get("clubId")));
             }
 
-            // Filtro pelo clube.
             if (clubId != null) {
                 predicates = cb.and(
                         predicates,
                         cb.equal(root.get("clubId"), clubId));
             }
 
-            // Idade mínima.
             if (minAge != null) {
                 predicates = cb.and(
                         predicates,
@@ -96,7 +90,6 @@ public final class PlayerSpecifications {
                                 root.get("age"), minAge));
             }
 
-            // Idade máxima.
             if (maxAge != null) {
                 predicates = cb.and(
                         predicates,

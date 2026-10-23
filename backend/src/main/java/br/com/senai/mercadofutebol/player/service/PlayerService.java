@@ -1,22 +1,17 @@
 
 package br.com.senai.mercadofutebol.player.service;
 
-
 import br.com.senai.mercadofutebol.player.PlayerBaseValueCalculator;
 import br.com.senai.mercadofutebol.player.PlayerMarketValueCalculator;
 import br.com.senai.mercadofutebol.player.PlayerOverallCalculator;
-
+import br.com.senai.mercadofutebol.player.dto.PlayerConditionRequest;
 import br.com.senai.mercadofutebol.player.dto.PlayerCreateRequest;
 import br.com.senai.mercadofutebol.player.dto.PlayerPageResponse;
 import br.com.senai.mercadofutebol.player.dto.PlayerResponse;
 import br.com.senai.mercadofutebol.player.dto.PlayerUpdateRequest;
-import br.com.senai.mercadofutebol.player.dto.PlayerConditionRequest;
-
 import br.com.senai.mercadofutebol.player.entity.PhysicalCondition;
 import br.com.senai.mercadofutebol.player.entity.Player;
-
 import br.com.senai.mercadofutebol.player.exception.BusinessRuleException;
-
 import br.com.senai.mercadofutebol.player.repository.PlayerRepository;
 import br.com.senai.mercadofutebol.player.repository.PlayerSpecifications;
 
@@ -27,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
 
 @Service
 public class PlayerService {
@@ -64,7 +59,7 @@ public class PlayerService {
         player.setPhysical(request.physical());
         player.setPotential(request.potential());
         player.setCondition(PhysicalCondition.APTO);
-        player.setDeleted(false);
+        player.setDeletedAt(null);
         player.setBaseValue(PlayerBaseValueCalculator.calculate(player));
 
         return playerRepository.save(player);
@@ -86,7 +81,7 @@ public class PlayerService {
             String position,
             String condition,
             Boolean free,
-            Long clubId,
+            Integer clubId,
             Integer minAge,
             Integer maxAge,
             BigDecimal minValue,
@@ -206,8 +201,8 @@ public class PlayerService {
     }
 
     @Transactional(readOnly = true)
-    public PlayerResponse getById(Long id) {
-        Player player = playerRepository.findByIdAndDeletedFalse(id)
+    public PlayerResponse getById(Integer id) {
+        Player player = playerRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
                         "Jogador não encontrado."));
@@ -215,111 +210,146 @@ public class PlayerService {
         return PlayerResponse.from(player);
     }
 
-        @Transactional
-public PlayerResponse update(Long id, PlayerUpdateRequest request) {
-    Player player = playerRepository.findByIdAndDeletedFalse(id)
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Jogador não encontrado."));
+    @Transactional
+    public PlayerResponse update(Integer id, PlayerUpdateRequest request) {
+        if (request == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Os dados de atualização são obrigatórios.");
+        }
 
-    String normalizedName = request.name()
-            .trim()
-            .replaceAll("\\s+", " ");
+        Player player = playerRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Jogador não encontrado."));
 
-    if (normalizedName.split(" ").length < 2) {
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "O nome deve conter pelo menos duas palavras.");
+        if (request.name() == null || request.name().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O nome do jogador é obrigatório.");
+        }
+
+        if (request.position() == null
+                || request.age() == null
+                || request.agility() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Posição, idade e agilidade são obrigatórias.");
+        }
+
+        if (request.age() < player.getAge()) {
+            throw new BusinessRuleException(
+                    "A idade do jogador não pode ser reduzida.");
+        }
+
+        if (player.getClubId() != null
+                && request.position() != player.getPosition()) {
+            throw new BusinessRuleException(
+                    "Não é permitido alterar a posição de um jogador vinculado a um clube.");
+        }
+
+        String normalizedName = request.name()
+                .trim()
+                .replaceAll("\\s+", " ");
+
+        if (normalizedName.split(" ").length < 2) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O nome deve conter pelo menos duas palavras.");
+        }
+
+        player.setName(normalizedName);
+        player.setPosition(request.position());
+        player.setAgility(request.agility());
+        player.setAge(request.age());
+
+        validateUpdatedPlayer(player);
+
+        return PlayerResponse.from(playerRepository.save(player));
     }
 
-    player.setName(normalizedName);
-    player.setPosition(request.position());
-    player.setAgility(request.agility());
-    player.setAge(request.age());
+    @Transactional
+    public PlayerResponse updateCondition(
+            Integer id,
+            PlayerConditionRequest request) {
 
-    validateUpdatedPlayer(player);
+        if (request == null || request.condition() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "A condição física é obrigatória.");
+        }
 
-    player.setBaseValue(PlayerBaseValueCalculator.calculate(player));
+        Player player = playerRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Jogador não encontrado."));
 
-    Player updated = playerRepository.save(player);
-    return PlayerResponse.from(updated);
-}
+        if (player.getCondition() == PhysicalCondition.DOENTE
+                && request.condition() == PhysicalCondition.APTO) {
+            throw new BusinessRuleException(
+                    "Não é permitido alterar diretamente de DOENTE para APTO.");
+        }
 
-@Transactional
-public PlayerResponse updateCondition(
-        Long id,
-        PlayerConditionRequest request) {
+        player.setCondition(request.condition());
 
-    Player player = playerRepository.findByIdAndDeletedFalse(id)
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Jogador não encontrado."));
-
-    if (player.getCondition() == PhysicalCondition.DOENTE
-            && request.condition() == PhysicalCondition.APTO) {
-        throw new BusinessRuleException(
-                "Não é permitido alterar diretamente de DOENTE para APTO.");
+        return PlayerResponse.from(playerRepository.save(player));
     }
 
-    player.setCondition(request.condition());
+    @Transactional
+    public void delete(Integer id) {
+        Player player = playerRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Jogador não encontrado."));
 
-    Player updated = playerRepository.save(player);
-    return PlayerResponse.from(updated);
-}
+        if (player.getClubId() != null) {
+            throw new BusinessRuleException(
+                    "Não é permitido excluir um jogador vinculado a um clube.");
+        }
 
-@Transactional
-public void delete(Long id) {
-    Player player = playerRepository.findByIdAndDeletedFalse(id)
-            .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.NOT_FOUND,
-                    "Jogador não encontrado."));
-
-    if (player.getClubId() != null) {
-        throw new BusinessRuleException(
-                "Não é permitido excluir um jogador vinculado a um clube.");
+        player.setDeletedAt(LocalDateTime.now());
+        playerRepository.save(player);
     }
 
-    player.setDeleted(true);
-    playerRepository.save(player);
-}
+    private void validateUpdatedPlayer(Player player) {
+        if (player.getAge() >= 35 && player.getAgility() > 85) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Jogadores com 35 anos ou mais não podem ter agilidade acima de 85.");
+        }
 
-private void validateUpdatedPlayer(Player player) {
-    int maxAttribute = Math.max(
-            Math.max(player.getPace(), player.getShooting()),
-            Math.max(
-                    Math.max(player.getPassing(), player.getDribbling()),
-                    Math.max(player.getDefending(), player.getPhysical())));
+        int maxAttribute = Math.max(
+                Math.max(player.getPace(), player.getShooting()),
+                Math.max(
+                        Math.max(player.getPassing(), player.getDribbling()),
+                        Math.max(player.getDefending(), player.getPhysical())));
 
-    if (player.getAge() >= 35 && player.getAgility() > 85) {
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Jogadores com 35 anos ou mais não podem ter agilidade acima de 85.");
+        if (player.getPotential() < maxAttribute) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O potencial não pode ser inferior ao maior atributo.");
+        }
+
+        if (player.getAge() >= 33
+                && player.getPotential() != maxAttribute) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Para jogadores com 33 anos ou mais, o potencial deve ser igual ao maior atributo.");
+        }
     }
-
-    if (player.getAge() >= 33 && player.getPotential() != maxAttribute) {
-        throw new ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Para jogadores com 33 anos ou mais, o potencial deve ser igual ao maior atributo.");
-    }
-}
 
     private Comparator<Player> comparatorFor(String field) {
         Comparator<Player> comparator = switch (field) {
             case "name" -> Comparator.comparing(
                     Player::getName,
                     String.CASE_INSENSITIVE_ORDER);
-
             case "age" -> Comparator.comparing(Player::getAge);
-
             case "overall" -> Comparator.comparingInt(
                     PlayerOverallCalculator::calculate);
-
             case "base_value" -> Comparator.comparing(
                     Player::getBaseValue);
-
             case "market_value" -> Comparator.comparing(
                     PlayerMarketValueCalculator::calculate);
-
             default -> Comparator.comparing(Player::getId);
         };
 
@@ -327,6 +357,27 @@ private void validateUpdatedPlayer(Player player) {
     }
 
     private void validateBusinessRules(PlayerCreateRequest request) {
+        if (request.name() == null || request.name().isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "O nome do jogador é obrigatório.");
+        }
+
+        if (request.position() == null
+                || request.age() == null
+                || request.agility() == null
+                || request.pace() == null
+                || request.shooting() == null
+                || request.passing() == null
+                || request.dribbling() == null
+                || request.defending() == null
+                || request.physical() == null
+                || request.potential() == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Todos os campos obrigatórios do jogador devem ser informados.");
+        }
+
         String normalizedName = request.name()
                 .trim()
                 .replaceAll("\\s+", " ");

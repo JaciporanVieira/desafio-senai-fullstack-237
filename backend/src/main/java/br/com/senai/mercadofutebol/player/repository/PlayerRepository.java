@@ -1,3 +1,4 @@
+
 package br.com.senai.mercadofutebol.player.repository;
 
 import br.com.senai.mercadofutebol.player.entity.Player;
@@ -10,12 +11,15 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import java.util.Optional;
 
 public interface PlayerRepository extends
-        JpaRepository<Player, Long>,
+        JpaRepository<Player, Integer>,
         JpaSpecificationExecutor<Player> {
 
-    Optional<Player> findByIdAndDeletedFalse(Long id);
+    Optional<Player> findByIdAndDeletedAtIsNull(Integer id);
 
-    Page<Player> findAllByDeletedFalse(Pageable pageable);
+    Page<Player> findAllByDeletedAtIsNull(Pageable pageable);
 
-    Page<Player> findAll(Specification<Player> specification, Pageable pageable);
+    Page<Player> findAll(
+            Specification<Player> specification,
+            Pageable pageable
+    );
 }

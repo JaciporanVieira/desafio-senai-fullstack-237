@@ -49,7 +49,7 @@ public class PlayerController {
             @RequestParam(required = false) String position,
             @RequestParam(required = false) String condition,
             @RequestParam(required = false) Boolean free,
-            @RequestParam(name = "club_id", required = false) Long clubId,
+            @RequestParam(name = "club_id", required = false) Integer clubId,
             @RequestParam(name = "min_age", required = false) Integer minAge,
             @RequestParam(name = "max_age", required = false) Integer maxAge,
             @RequestParam(name = "min_value", required = false) BigDecimal minValue,
@@ -63,14 +63,14 @@ public class PlayerController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PlayerResponse> getById(
-            @PathVariable Long id) {
+            @PathVariable Integer id) {
 
         return ResponseEntity.ok(playerService.getById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PlayerResponse> update(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody PlayerUpdateRequest request) {
 
         return ResponseEntity.ok(playerService.update(id, request));
@@ -78,7 +78,7 @@ public class PlayerController {
 
     @PatchMapping("/{id}/condition")
     public ResponseEntity<PlayerResponse> updateCondition(
-            @PathVariable Long id,
+            @PathVariable Integer id,
             @Valid @RequestBody PlayerConditionRequest request) {
 
         return ResponseEntity.ok(
@@ -86,7 +86,7 @@ public class PlayerController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         playerService.delete(id);
         return ResponseEntity.noContent().build();
     }

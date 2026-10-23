@@ -1,3 +1,4 @@
+
 package br.com.senai.mercadofutebol.player.dto;
 
 import br.com.senai.mercadofutebol.player.PlayerMarketValueCalculator;
@@ -10,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.math.BigDecimal;
 
 public record PlayerResponse(
-        Long id,
+        Integer id,
         String name,
         PlayerPosition position,
         Integer agility,
@@ -23,7 +24,7 @@ public record PlayerResponse(
         Integer physical,
         Integer potential,
         PhysicalCondition condition,
-        Long clubId,
+        Integer clubId,
         int overall,
 
         @JsonProperty("base_value")

@@ -8,109 +8,126 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "players")
+@Table(name = "jogadores")
 public class Player {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @NotNull
     @Size(min = 3, max = 100)
-    @Column(nullable = false, length = 100)
+    @Column(name = "nome", nullable = false, length = 100)
     private String name;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 3)
+    @Column(name = "posicao", nullable = false, length = 3)
     private PlayerPosition position;
 
     @NotNull
     @Min(1)
     @Max(100)
-    @Column(nullable = false)
+    @Column(name = "agilidade", nullable = false)
     private Integer agility;
 
     @NotNull
     @Min(16)
     @Max(45)
-    @Column(nullable = false)
+    @Column(name = "idade", nullable = false)
     private Integer age;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "velocidade", nullable = false)
     private Integer pace;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "finalizacao", nullable = false)
     private Integer shooting;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "passe", nullable = false)
     private Integer passing;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "drible", nullable = false)
     private Integer dribbling;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "defesa", nullable = false)
     private Integer defending;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "fisico", nullable = false)
     private Integer physical;
 
     @NotNull
     @Min(1)
     @Max(99)
-    @Column(nullable = false)
+    @Column(name = "potencial", nullable = false)
     private Integer potential;
 
     @NotNull
-    @Column(name = "base_value", nullable = false, precision = 12, scale = 2)
+    @Column(name = "valor_base", nullable = false, precision = 6, scale = 2)
     private BigDecimal baseValue;
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(name = "condicao", nullable = false, length = 20)
     private PhysicalCondition condition = PhysicalCondition.APTO;
 
-    @Column(name = "club_id")
-    private Long clubId;
+    @Column(name = "clube_id")
+    private Integer clubId;
 
-    @Column(name = "is_deleted", nullable = false)
-    private boolean deleted = false;
+    @Column(name = "excluido_em")
+    private LocalDateTime deletedAt;
+
+    @Column(name = "criado_em", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "atualizado_em", nullable = false)
+    private LocalDateTime updatedAt;
 
     public Player() {
     }
 
     @PrePersist
     protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+
         if (condition == null) {
             condition = PhysicalCondition.APTO;
-        }
-        if (deleted == false) {
-            deleted = false;
-        }
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+        if (createdAt == null) {
+            createdAt = now;
+    }
+
+    updatedAt = now;
+}
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+
+    public Integer getId() { return id; }
+    public void setId(Integer id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -151,9 +168,23 @@ public class Player {
     public PhysicalCondition getCondition() { return condition; }
     public void setCondition(PhysicalCondition condition) { this.condition = condition; }
 
-    public Long getClubId() { return clubId; }
-    public void setClubId(Long clubId) { this.clubId = clubId; }
+    public Integer getClubId() { return clubId; }
+    public void setClubId(Integer clubId) { this.clubId = clubId; }
 
-    public boolean isDeleted() { return deleted; }
-    public void setDeleted(boolean deleted) { this.deleted = deleted; }
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
+
+    public boolean isDeleted() {
+        return deletedAt != null;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deletedAt = deleted ? LocalDateTime.now() : null;
+    }
 }
