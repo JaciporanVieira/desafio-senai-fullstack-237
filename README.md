@@ -200,7 +200,7 @@ Para executar a suíte de testes automatizados do backend:
 mvn -f .\backend\pom.xml clean test
 ```
 
-Na última execução registrada durante o desenvolvimento, **18 testes passaram, sem falhas ou erros**. Execute novamente o comando acima para confirmar o resultado no estado atual do repositório.
+Na última execução, foram executados 18 testes, todos aprovados, sem falhas, erros ou testes ignorados, conforme o resultado BUILD SUCCESS do Maven.
 
 ## 9. Estrutura do repositório
 
