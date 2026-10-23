@@ -16,7 +16,7 @@ A implementação foi concentrada inicialmente no backend, com foco no módulo d
 | Persistência PostgreSQL | Configurada |
 | Migrações com Flyway | Configuradas |
 | Testes automatizados do backend | Implementados |
-| Estrutura inicial do frontend React + Vite | Estrutuda inicial criada |
+| Estrutura inicial do frontend React + Vite | Estrutura inicial criada |
 
 A entrega representa uma implementação parcial do escopo solicitado. Os itens pendentes estão identificados para manter a documentação fiel ao estado atual do código.
 
