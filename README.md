@@ -16,9 +16,8 @@ A implementação foi concentrada inicialmente no backend, com foco no módulo d
 | Persistência PostgreSQL | Configurada |
 | Migrações com Flyway | Configuradas |
 | Testes automatizados do backend | Implementados |
-| Estrutura inicial do frontend React + Vite | Estrutura inicial criada |
+| Frontend React + Vite | Estrutura inicial criada |
 
-A entrega representa uma implementação parcial do escopo solicitado. Os itens pendentes estão identificados para manter a documentação fiel ao estado atual do código.
 
 ## 2. Tecnologias utilizadas
 
@@ -39,7 +38,7 @@ A entrega representa uma implementação parcial do escopo solicitado. Os itens 
 - Vite
 - npm
 
-O frontend utiliza React e Vite como tecnologias-base para a camada de apresentação da aplicação, com estrutura inicial para o desenvolvimento da interface e integração com a API REST de jogadores.
+O frontend utiliza React e Vite como tecnologias fundamentais para a camada de apresentação da aplicação, com estrutura inicial para o desenvolvimento da interface e integração com a API REST de jogadores.
 
 ## 3. Arquitetura
 
@@ -200,7 +199,7 @@ Para executar a suíte de testes automatizados do backend:
 mvn -f .\backend\pom.xml clean test
 ```
 
-Na última execução, foram executados 18 testes, todos aprovados, sem falhas, erros ou testes ignorados, conforme o resultado BUILD SUCCESS do Maven.
+Na última execução da suíte de testes automatizados, os 18 testes foram aprovados, sem falhas, erros ou testes ignorados. A execução foi concluída com sucesso pelo Maven (BUILD SUCCESS).
 
 ## 9. Estrutura do repositório
 
@@ -231,11 +230,13 @@ O arquivo `frontend/README.md` permanece como a documentação original do templ
 - Uso de PostgreSQL para persistência relacional.
 - Uso de Flyway para versionar as alterações do esquema do banco.
 - Uso de testes automatizados para verificar comportamentos do serviço e dos cálculos.
-- Identificação explícita das funcionalidades pendentes para evitar apresentar como concluído aquilo que ainda não foi implementado.
+- Documentação transparente do escopo implementado e das funcionalidades previstas para as próximas etapas.
 
-## 11. Funcionalidades pendentes
+## 11. Escopo desta versão
 
-A implementação ainda não contempla integralmente o escopo do desafio. Permanecem pendentes:
+Esta versão concentra-se na implementação do módulo de jogadores no backend, incluindo API REST, regras de negócio, persistência e testes automatizados.
+
+A evolução do projeto para contemplar integralmente o escopo do desafio inclui:
 
 - Interface web funcional e integração do React com a API.
 - Módulo completo de clubes e respectivas regras de negócio.
