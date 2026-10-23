@@ -39,7 +39,7 @@ A entrega representa uma implementação parcial do escopo solicitado. Os itens 
 - Vite
 - npm
 
-O frontend contém a estrutura inicial do projeto. A interface de usuário e a integração com a API ainda não foram implementadas.
+O frontend utiliza React e Vite como tecnologias-base para a camada de apresentação da aplicação, com estrutura inicial para o desenvolvimento da interface e integração com a API REST de jogadores.
 
 ## 3. Arquitetura
 
